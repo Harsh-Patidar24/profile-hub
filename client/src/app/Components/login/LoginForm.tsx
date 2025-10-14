@@ -30,27 +30,39 @@ export default function LoginForm() {
       e.preventDefault();
       if (!validate()) return;
       setLoading(true);
+
       try {
-        await login(email, password);
-        router.push("/Components/dashboard");
+        const { user } = await login(email, password);
+
+        if (user) {
+          router.push("/Components/dashboard");
+        }
       } catch (err: any) {
         setError(err?.response?.data?.message || "Login failed");
       } finally {
         setLoading(false);
       }
     },
-    [email, password, login, router, validate]
+    [email, password, login, router, validate, setLoading]
   );
 
-
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md"
+    >
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Login</h2>
 
-      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded border border-red-200">{error}</div>}
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 text-red-700 rounded border border-red-200">
+          {error}
+        </div>
+      )}
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Email
+        </label>
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -61,7 +73,9 @@ export default function LoginForm() {
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Password
+        </label>
         <input
           value={password}
           onChange={(e) => setPassword(e.target.value)}

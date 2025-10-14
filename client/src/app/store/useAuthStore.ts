@@ -1,3 +1,46 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+interface User {
+    name?: string;
+    email?: string;
+    [key: string]: any;
+}
+
+interface AuthState {
+    user: User | null;
+    token: string | null;
+    isAuthenticated: boolean;
+    loginS: (user: User, token: string) => void;
+    logoutS: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+    persist(
+        (set) => ({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+
+            loginS: (user, token) => {
+                set({ user, token, isAuthenticated: true });
+            },
+
+            logoutS: () => {
+                set({ user: null, token: null, isAuthenticated: false });
+            },
+        }),
+        {
+            name: "auth-storage",
+        }
+    )
+);
+
+
+
+
+
+
 // "use client";
 // import { create } from "zustand";
 // import api from "../../lib/axios";

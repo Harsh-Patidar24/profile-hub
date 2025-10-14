@@ -1,30 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useAuthStore } from "../../store/useAuthStore";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, logoutS, user } = useAuthStore();
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-
-    const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    router.push("/Components/login");
+    if (typeof window !== "undefined") {
+      // const confirmLogout = confirm("Are you sure you want to logout?");
+      // if (confirmLogout) {
+        logoutS();
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        router.push("/Components/login");
+      // }
+    }
   };
 
   return (
@@ -35,9 +28,13 @@ export default function Navbar() {
         </Link>
 
         <nav className="flex items-center gap-6 text-sm font-medium">
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <>
-              <Link href="/Components/dashboard" className="hover:text-blue-600 transition">
+              <span className="text-gray-700 underline">Hi, {user?.name}</span>
+              <Link
+                href="/Components/dashboard"
+                className="hover:text-blue-600 transition"
+              >
                 Dashboard
               </Link>
               <button
@@ -49,10 +46,16 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/Components/login" className="hover:text-blue-600 transition">
+              <Link
+                href="/Components/login"
+                className="hover:text-blue-600 transition"
+              >
                 Login
               </Link>
-              <Link href="/Components/register" className="hover:text-blue-600 transition">
+              <Link
+                href="/Components/register"
+                className="hover:text-blue-600 transition"
+              >
                 Register
               </Link>
             </>
