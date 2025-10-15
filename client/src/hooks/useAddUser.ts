@@ -2,6 +2,7 @@
 import { useState } from "react";
 import api from "../lib/axios";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export const useAddUser = () => {
   const router = useRouter();
@@ -21,10 +22,12 @@ export const useAddUser = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      alert("User added successfully!");
+      // alert("User added successfully!");
+      toast.success(`User Added Sucessfully`)
       router.push("/Components/dashboard");
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Failed to add user");
+      toast.error(`Failed To Add User`)
     } finally {
       setLoading(false);
     }

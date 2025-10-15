@@ -2,6 +2,7 @@
 import { useState } from "react";
 import api from "../lib/axios";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export const useRegister = () => {
   const router = useRouter();
@@ -22,8 +23,10 @@ export const useRegister = () => {
       });
 
       router.push("/Components/login");
+      toast.success(`User Registered Sucessfully`)
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Registration failed");
+      toast.error(`Registeration Failed`)
     } finally {
       setLoading(false);
     }

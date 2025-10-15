@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const { isAuthenticated, logoutS, user } = useAuthStore();
@@ -12,10 +13,12 @@ export default function Navbar() {
     if (typeof window !== "undefined") {
       // const confirmLogout = confirm("Are you sure you want to logout?");
       // if (confirmLogout) {
-        logoutS();
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        router.push("/Components/login");
+      logoutS();
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      toast.success(`${user?.name} User Is Logged Out Sucessfully`);
+
+      router.push("/Components/login");
       // }
     }
   };

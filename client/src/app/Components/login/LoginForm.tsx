@@ -2,6 +2,8 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
+import toast from "react-hot-toast";
+
 
 export default function LoginForm() {
   const router = useRouter();
@@ -33,11 +35,13 @@ export default function LoginForm() {
 
       try {
         const { user } = await login(email, password);
+        toast.success(`${user?.name} is logged in sucessfully`)
 
         if (user) {
           router.push("/Components/dashboard");
         }
       } catch (err: any) {
+        toast.error(`failed to login`)
         setError(err?.response?.data?.message || "Login failed");
       } finally {
         setLoading(false);

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAddUser } from "@/hooks/useAddUser";
+import toast from "react-hot-toast";
 
 export default function AddUserPage() {
   const router = useRouter();
@@ -45,6 +46,7 @@ export default function AddUserPage() {
     e.preventDefault();
     if (!validate()) return;
     await addUser(form, profileImage);
+    toast.success(`User Added Sucessfully`);
   };
 
   const handleCancel = () => router.push("/Components/dashboard");

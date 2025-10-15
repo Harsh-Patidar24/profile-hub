@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "../lib/axios";
 import { IUser } from "../types/user";
+import toast from "react-hot-toast";
 
 export const useUsers = (isLoggedIn: boolean, loading: boolean) => {
   const [users, setUsers] = useState<IUser[]>([]);
@@ -28,9 +29,11 @@ export const useUsers = (isLoggedIn: boolean, loading: boolean) => {
     try {
       await api.delete(`/api/users/${id}`);
       setUsers((prev) => prev.filter((u) => u._id !== id));
+      toast.success(`User Deleted Sucessfully`)
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Failed to delete user");
+      toast.error("Failed To Delete User")
+      // alert("Failed to delete user");
     }
   };
 
