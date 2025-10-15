@@ -31,7 +31,7 @@ export default function UserProfilePage() {
       try {
         const res = await api.get(`/api/users/${userId}`);
         setUser(res.data);
-        setForm(res.data); 
+        setForm(res.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -61,19 +61,18 @@ export default function UserProfilePage() {
     setSaving(true);
     try {
       const formData = new FormData();
-
-      Object.keys(form).forEach(key => {
+      Object.keys(form).forEach((key) => {
         if (form[key] !== null && form[key] !== undefined) {
           formData.append(key, form[key]);
         }
       });
 
-      if (password) formData.append('password', password);
-      if (imageFile) formData.append('profileImage', imageFile);
+      if (password) formData.append("password", password);
+      if (imageFile) formData.append("profileImage", imageFile);
 
       const response = await api.put(`/api/users/${userId}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
@@ -98,123 +97,163 @@ export default function UserProfilePage() {
     router.push("/Components/dashboard");
     setImageFile(null);
     setImagePreview(null);
-    // router.push("/dashboard");
   };
 
-  if (authLoading || loading || !user) return <div>Loading...</div>;
+  if (authLoading || loading || !user)
+    return (
+      <div className="flex items-center justify-center h-screen text-lg font-medium text-gray-600">
+        Loading user profile...
+      </div>
+    );
 
   const isAdmin = me?.role === "admin";
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow space-y-4">
-      <h2 className="text-2xl font-semibold">{user.name}</h2>
-      {error && <p className="text-red-600">{error}</p>}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+          {isAdmin ? `Edit Profile - ${user.name}` : `${user.name}'s Profile`}
+        </h2>
 
-      {isAdmin && (
-        <div className="space-y-3">
-          <label className="block text-sm font-medium">Profile Image</label>
-          <div className="flex items-center gap-4">
-            <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+        {error && (
+          <div className="mb-4 bg-red-100 text-red-600 p-3 rounded-lg text-center">
+            {error}
+          </div>
+        )}
+
+        {/* Profile Image Section */}
+        <div className="flex flex-col items-center gap-4 mb-8">
+          <div className="relative">
+            <div className="w-32 h-32 rounded-full overflow-hidden shadow-md border border-gray-200">
               {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
               ) : user.profileImage ? (
-                <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
+                <img
+                  src={user.profileImage}
+                  alt={user.name}
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <span className="text-3xl text-gray-500">{user.name.charAt(0).toUpperCase()}</span>
+                <div className="flex items-center justify-center h-full text-4xl font-bold bg-gray-200 text-gray-500">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
               )}
             </div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
+            {isAdmin && (
+              <label className="absolute bottom-0 right-0 bg-blue-600 text-white text-xs py-1 px-3 rounded-full cursor-pointer hover:bg-blue-700 transition">
+                Change
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
         </div>
-      )}
 
-      {!isAdmin && user.profileImage && (
-        <div className="flex justify-center">
-          <div className="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
-            <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
-          </div>
-        </div>
-      )}
+        {/* User Details */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <InputField
+            label="Email"
+            value={form.email ?? ""}
+            editable={isAdmin}
+            onChange={(val) => onChange("email", val)}
+          />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-sm font-medium">Email</label>
-          {isAdmin ? (
-            <input
-              type="email"
-              value={form.email ?? ""}
-              onChange={(e) => onChange("email", e.target.value)}
-              className="mt-1 w-full border px-3 py-2 rounded"
-            />
-          ) : (
-            <p className="mt-1">{user.email}</p>
-          )}
-        </div>
-
-        {isAdmin && (
-          <div>
-            <label className="block text-sm font-medium">Password</label>
-            <input
+          {isAdmin && (
+            <InputField
+              label="Password"
               type="password"
               placeholder="Enter new password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full border px-3 py-2 rounded"
+              onChange={(val) => setPassword(val)}
             />
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+          {[
+            "name",
+            "role",
+            "age",
+            "phone",
+            "address",
+            "city",
+            "country",
+            "zipCode",
+          ].map((field) => (
+            <InputField
+              key={field}
+              label={field.charAt(0).toUpperCase() + field.slice(1)}
+              type={field === "age" ? "number" : "text"}
+              value={form[field] ?? ""}
+              editable={isAdmin}
+              onChange={(val) => onChange(field, val)}
+            />
+          ))}
+        </div>
+
+        {/* Buttons */}
+        {isAdmin && (
+          <div className="flex gap-4 mt-8">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition shadow"
+            >
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              onClick={handleCancel}
+              className="flex-1 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 font-semibold transition"
+            >
+              Cancel
+            </button>
           </div>
         )}
       </div>
-
-      {[
-        "name",
-        "role",
-        "age",
-        "phone",
-        "address",
-        "city",
-        "country",
-        "zipCode",
-      ].map((field) => (
-        <div key={field}>
-          <label className="block text-sm font-medium capitalize">
-            {field}
-          </label>
-          {isAdmin ? (
-            <input
-              type={field === "age" ? "number" : "text"}
-              value={form[field] ?? ""}
-              onChange={(e) => onChange(field, e.target.value)}
-              className="mt-1 w-full border px-3 py-2 rounded"
-            />
-          ) : (
-            <p className="mt-1">{user[field as keyof IUser] ?? "-"}</p>
-          )}
-        </div>
-      ))}
-
-      {isAdmin && (
-        <div className="flex gap-3 mt-4">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex-1 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-          >
-            {saving ? "Saving..." : "Save"}
-          </button>
-          <button
-            onClick={handleCancel}
-            type="button"
-            className="flex-1 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
     </div>
   );
 }
+
+/* 🔹 Reusable Input Component */
+const InputField = ({
+  label,
+  value,
+  onChange,
+  editable = false,
+  type = "text",
+  placeholder = "",
+}: {
+  label: string;
+  value: any;
+  onChange?: (val: any) => void;
+  editable?: boolean;
+  type?: string;
+  placeholder?: string;
+}) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {label}
+    </label>
+    {editable ? (
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+      />
+    ) : (
+      <p className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
+        {value || "-"}
+      </p>
+    )}
+  </div>
+);

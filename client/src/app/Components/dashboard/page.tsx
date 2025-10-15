@@ -4,6 +4,8 @@ import { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
 import { useUsers } from "@/hooks/useUsers";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 const DashboardPage = () => {
   const router = useRouter();
@@ -15,18 +17,29 @@ const DashboardPage = () => {
     [router]
   );
 
+  const handleDeleteWithToast = async (id: string) => {
+    try {
+      await handleDelete(id);
+      toast.success("User deleted successfully!");
+    } catch (err) {
+      toast.error("Failed to delete user!");
+    }
+  };
+
   const userItems = useMemo(
     () =>
       users.map((u) => (
-        <div
+        <motion.div
           key={u._id}
-          className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg hover:shadow-lg transition"
+          whileHover={{ scale: 1.03, boxShadow: "0 10px 20px rgba(0,0,0,0.12)" }}
+          transition={{ duration: 0.3 }}
+          className="bg-white shadow-md rounded-lg overflow-hidden cursor-pointer"
         >
           <div
-            className="flex items-center gap-3 flex-1 justify-center cursor-pointer"
+            className="p-4 flex flex-col items-center justify-center gap-3 text-center"
             onClick={() => onUserClick(u._id)}
           >
-            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-blue-500 text-white uppercase font-semibold">
+            <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-blue-500 text-white uppercase font-bold text-xl">
               {u.profileImage ? (
                 <img
                   src={u.profileImage}
@@ -37,41 +50,42 @@ const DashboardPage = () => {
                 u.name.charAt(0)
               )}
             </div>
-            <div className="text-center">
-              <div className="font-medium text-gray-800">{u.name}</div>
-              <div className="text-sm text-gray-500">{u.email}</div>
+            <div>
+              <div className="font-semibold text-gray-800 text-lg">{u.name}</div>
+              <div className="text-gray-500 text-sm">{u.email}</div>
             </div>
           </div>
 
           {user?.role === "admin" && (
-            <div className="flex gap-2">
+            <div className="flex justify-center gap-2 pb-3">
               <button
                 onClick={() => router.push(`/user/${u._id}`)}
-                className="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600"
+                className="px-4 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition"
               >
                 Edit
               </button>
               <button
-                onClick={() => handleDelete(u._id)}
-                className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                onClick={() => handleDeleteWithToast(u._id)}
+                className="px-4 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
               >
                 Delete
               </button>
             </div>
           )}
-        </div>
+        </motion.div>
       )),
     [users, user, handleDelete, onUserClick, router]
   );
 
-  if (loading || !isLoggedIn) return <div>Loading...</div>;
+  if (loading || !isLoggedIn)
+    return <div className="text-center py-20 text-gray-500">Loading...</div>;
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h2 className="text-3xl font-bold text-gray-800">Users</h2>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           {user && (
             <div className="text-sm text-gray-600">
               Logged in as <span className="font-medium">{user.name}</span>
@@ -92,7 +106,9 @@ const DashboardPage = () => {
       {fetching ? (
         <div className="text-center py-8 text-gray-500">Loading users...</div>
       ) : (
-        <div className="flex flex-col gap-4">{userItems}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {userItems}
+        </div>
       )}
     </div>
   );

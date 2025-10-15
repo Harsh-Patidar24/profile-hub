@@ -1,11 +1,15 @@
 // src/app/page.tsx
 import Link from "next/link";
+import HomePage from "./Components/HomePage";
+import RootLayout from "./layout";
+// import RootLayout from "./layout"
 
 export default function Home() {
   return (
     <section className="py-16">
-      <div className="max-w-3xl mx-auto text-center">
-        <h1 className="text-3xl font-bold mb-4">Welcome to Profile Hub</h1>
+      {/* <div className="max-w-3xl mx-auto text-center"> */}
+        {/* <RootLayout /> */}
+        {/* <h1 className="text-3xl font-bold mb-4">Welcome to Profile Hub</h1>
         <p className="text-gray-600 mb-8">
           A small user-management demo (roles: user, admin, superadmin).
         </p>
@@ -31,8 +35,8 @@ export default function Home() {
           >
             Dashboard
           </Link>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
     </section>
   );
 }
